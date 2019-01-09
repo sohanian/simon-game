@@ -25,14 +25,14 @@ class Button extends React.Component {
     }
     
     this.setState({
-      active: true
+      active: true,
     });
-    setTimeout(() => {
-      this.setState({
-        active: false
-      });
-    }, 400);
   };
+
+  inactivate = () => 
+    this.setState({
+      active: false,
+    });
 
   sound = new Audio(`/sounds/${this.props.color}.mp3`);
 
@@ -48,7 +48,7 @@ class Button extends React.Component {
     return (
       <div
         className={`button ${color} ${active ? "active" : ""} ${isPlayerTurn ? "clickable" : ""}`}
-        onClick={this.playerClick}
+        onClick={this.playerClick} onTransitionEnd={this.inactivate}
       />
     );
   }

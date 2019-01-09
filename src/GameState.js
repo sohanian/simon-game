@@ -14,7 +14,7 @@ const GameState = ({ gameState, round, newGame, setMute, muted }) => {
     <div className="gameState">
       {state}
       <div className="mute">
-        <label>Mute <input type="checkbox" onClick={setMute} checked={muted} /></label>
+        <label>Mute <input type="checkbox" onClick={setMute} defaultChecked={muted} /></label>
       </div>
     </div>
   );

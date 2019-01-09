@@ -5,7 +5,7 @@ import Broadcaster from "./Broadcaster";
 import GameState from "./GameState";
 import Button from "./Button";
 
-const INTERVAL = 750;
+const INTERVAL = 1000;
 const colors = ["green", "red", "blue", "yellow"];
 
 class App extends React.Component {
