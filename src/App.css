@@ -53,3 +53,7 @@ body {
 .active::after {
   display: none;
 }
+
+.mute {
+  font-size: 11px;
+}

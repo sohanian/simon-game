@@ -20,7 +20,10 @@ class Button extends React.Component {
   };
 
   activate = () => {
-    this.sound.play();
+    if (!this.props.muted) {
+      this.sound.play();
+    }
+    
     this.setState({
       active: true
     });

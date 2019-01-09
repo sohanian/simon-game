@@ -5,13 +5,15 @@ import Broadcaster from "./Broadcaster";
 import GameState from "./GameState";
 import Button from "./Button";
 
+const INTERVAL = 750;
 const colors = ["green", "red", "blue", "yellow"];
 
 class App extends React.Component {
   state = {
     simonSays: [],
     playerSays: [],
-    gameState: "NONE"
+    gameState: "NONE",
+    muted: false,
   };
 
   broadcaster = new Broadcaster();
@@ -26,13 +28,17 @@ class App extends React.Component {
     this.simonTurn();
   };
 
-  endGame = () => {
+  endGame = () => 
     this.setState({
       simonSays: [],
       playerSays: [],
-      gameState: "FAIL"
+      gameState: "FAIL",
     });
-  };
+
+  setMute = (evnt) =>
+    this.setState({
+      muted: !!evnt.target.checked,
+    });
 
   simonTurn = () => {
     const simonSays = [
@@ -45,13 +51,14 @@ class App extends React.Component {
       playerSays: [],
     });
 
-    setTimeout(() => {
-      for (let i = 0; i < simonSays.length; i++) {
-        setTimeout(() => {
-          this.broadcaster.broadcast(simonSays[i]);
-        }, 750 * i);
+    let i = 0;
+    let sequence = setInterval(() => {
+      if (i < simonSays.length) {
+        this.broadcaster.broadcast(simonSays[i++]);
+      } else {
+        clearInterval(sequence);
       }
-    }, 1000);
+    }, INTERVAL);
   };
 
   playerClick = color => {
@@ -73,7 +80,7 @@ class App extends React.Component {
   };
 
   render() {
-    const { simonSays, playerSays, gameState } = this.state;
+    const { simonSays, playerSays, gameState, muted } = this.state;
     const isPlayerTurn =
       gameState === "PLAYING" && simonSays.length !== playerSays.length;
 
@@ -83,6 +90,8 @@ class App extends React.Component {
           round={simonSays.length}
           gameState={gameState}
           newGame={this.newGame}
+          setMute={this.setMute}
+          muted={muted}
         />
 
         {colors.map(color => (
@@ -92,6 +101,7 @@ class App extends React.Component {
             isPlayerTurn={isPlayerTurn}
             broadcaster={this.broadcaster}
             playerClick={this.playerClick}
+            muted={muted}
           />
         ))}
       </div>
