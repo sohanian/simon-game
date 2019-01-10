@@ -13,31 +13,34 @@ class App extends React.Component {
     simonSays: [],
     playerSays: [],
     gameState: "NONE",
-    muted: false,
+    muted: false
   };
 
   broadcaster = new Broadcaster();
+  sequence = null;
 
   newGame = () => {
     this.setState({
       simonSays: [],
       playerSays: [],
-      gameState: "PLAYING"
+      gameState: "PLAYING",
     });
 
     this.simonTurn();
   };
 
-  endGame = () => 
+  endGame = () => {
+    clearInterval(this.sequence);
     this.setState({
       simonSays: [],
       playerSays: [],
       gameState: "FAIL",
     });
+  };
 
-  setMute = (evnt) =>
+  setMute = evnt =>
     this.setState({
-      muted: !!evnt.target.checked,
+      muted: !!evnt.target.checked
     });
 
   simonTurn = () => {
@@ -48,15 +51,15 @@ class App extends React.Component {
 
     this.setState({
       simonSays,
-      playerSays: [],
+      playerSays: []
     });
 
     let i = 0;
-    let sequence = setInterval(() => {
+    this.sequence = setInterval(() => {
       if (i < simonSays.length) {
         this.broadcaster.broadcast(simonSays[i++]);
       } else {
-        clearInterval(sequence);
+        clearInterval(this.sequence);
       }
     }, INTERVAL);
   };
@@ -85,7 +88,7 @@ class App extends React.Component {
       gameState === "PLAYING" && simonSays.length !== playerSays.length;
 
     return (
-      <div className="App">
+      <div className="game">
         <GameState
           round={simonSays.length}
           gameState={gameState}
