@@ -1,6 +1,6 @@
 import React from "react";
 
-const GameState = ({ gameState, round, newGame, setMute, muted }) => {
+const GameState = ({ gameState, round, newGame, toggleMute, muted }) => {
   let state;
   if (gameState === "PLAYING") {
     state = <div>Round {round}, Light!</div>;
@@ -15,7 +15,7 @@ const GameState = ({ gameState, round, newGame, setMute, muted }) => {
       <div className="simon">simon</div>
       {state}
       <div className="mute">
-        <label>Mute <input type="checkbox" onClick={setMute} defaultChecked={muted} /></label>
+        <label>Mute <input type="checkbox" onClick={toggleMute} defaultChecked={muted} /></label>
       </div>
     </div>
   );

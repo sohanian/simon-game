@@ -8,108 +8,90 @@ import Button from "./Button";
 const INTERVAL = 1000;
 const colors = ["green", "red", "blue", "yellow"];
 
-class App extends React.Component {
-  state = {
-    simonSays: [],
-    playerSays: [],
-    gameState: "NONE",
-    muted: false
-  };
+let sequence = null;
+const broadcaster = new Broadcaster();
 
-  broadcaster = new Broadcaster();
-  sequence = null;
+const App = () => {
+  const [simonSays, setSimonSays] = React.useState([]);
+  const [playerSays, setPlayerSays] = React.useState([]);
+  const [gameState, setGameState] = React.useState("NONE");
+  const [muted, setMuted] = React.useState(false);
 
-  newGame = () => {
-    this.setState({
-      simonSays: [],
-      playerSays: [],
-      gameState: "PLAYING",
-    });
 
-    this.simonTurn();
-  };
-
-  endGame = () => {
-    clearInterval(this.sequence);
-    this.setState({
-      simonSays: [],
-      playerSays: [],
-      gameState: "FAIL",
-    });
-  };
-
-  setMute = evnt =>
-    this.setState({
-      muted: !!evnt.target.checked
-    });
-
-  simonTurn = () => {
-    const simonSays = [
-      ...this.state.simonSays,
+  const simonTurn = () => {
+    const newSimonSays = [
+      ...simonSays,
       colors[Math.floor(Math.random() * colors.length)]
     ];
 
-    this.setState({
-      simonSays,
-      playerSays: []
-    });
+    setSimonSays(newSimonSays);
+    setPlayerSays([]);
 
     let i = 0;
-    this.sequence = setInterval(() => {
-      if (i < simonSays.length) {
-        this.broadcaster.broadcast(simonSays[i++]);
+    sequence = setInterval(() => {
+      if (i < newSimonSays.length) {
+        broadcaster.broadcast(newSimonSays[i++]);
       } else {
-        clearInterval(this.sequence);
+        clearInterval(sequence);
       }
     }, INTERVAL);
   };
 
-  playerClick = color => {
-    const { simonSays } = this.state;
+  const newGame = () => {
+    setSimonSays([]);
+    setPlayerSays([]);
+    setGameState("PLAYING");
+    simonTurn();
+  };
 
-    const playerSays = [...this.state.playerSays, color];
+  const endGame = () => {
+    clearInterval(sequence);
+    setSimonSays([]);
+    setPlayerSays([]);
+    setGameState("FAIL");
+  };
 
-    this.setState({
-      playerSays
-    });
+  const playerClick = color => {
+    const newPlayerSays = [...playerSays, color];
 
-    if (simonSays[playerSays.length - 1] !== color) {
-      return this.endGame();
+    setPlayerSays(newPlayerSays);
+
+    if (simonSays[newPlayerSays.length - 1] !== color) {
+      endGame();
     }
 
-    if (simonSays.length === playerSays.length) {
-      return this.simonTurn();
+    if (simonSays.length === newPlayerSays.length) {
+      simonTurn();
     }
   };
 
-  render() {
-    const { simonSays, playerSays, gameState, muted } = this.state;
-    const isPlayerTurn =
-      gameState === "PLAYING" && simonSays.length !== playerSays.length;
+  const toggleMute = evnt => setMuted(!!evnt.target.checked);
 
-    return (
-      <div className="game">
-        <GameState
-          round={simonSays.length}
-          gameState={gameState}
-          newGame={this.newGame}
-          setMute={this.setMute}
+  const isPlayerTurn = gameState === "PLAYING" && simonSays.length !== playerSays.length;
+
+  return (
+    <div className="game">
+      <GameState
+        round={simonSays.length}
+        gameState={gameState}
+        newGame={newGame}
+        toggleMute={toggleMute}
+        muted={muted}
+      />
+
+      {colors.map(color => (
+        <Button
+          color={color}
+          key={color}
+          isPlayerTurn={isPlayerTurn}
+          broadcaster={broadcaster}
+          playerClick={playerClick}
           muted={muted}
         />
+      ))}
+    </div>
+  );
+};
 
-        {colors.map(color => (
-          <Button
-            color={color}
-            key={color}
-            isPlayerTurn={isPlayerTurn}
-            broadcaster={this.broadcaster}
-            playerClick={this.playerClick}
-            muted={muted}
-          />
-        ))}
-      </div>
-    );
-  }
-}
 
 export default App;
